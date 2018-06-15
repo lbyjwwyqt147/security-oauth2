@@ -25,8 +25,4 @@ spring:
       password: postgres123
       driver-class-name: org.postgresql.Driver
 
-
-security:
-  oauth2:
-    resource.:
-      filter-order: 3
+logging.level.org.springframework.security: DEBUG

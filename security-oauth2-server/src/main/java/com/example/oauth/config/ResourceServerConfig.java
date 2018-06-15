@@ -11,21 +11,26 @@ import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHand
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
-    private static final String RESOURCE_ID = "resource_id";
+    private static final String RESOURCE_ID = "order";
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
-        resources.resourceId(RESOURCE_ID).stateless(false);
+        resources.resourceId(RESOURCE_ID).stateless(true);
     }
+
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.
+        http
+                .authorizeRequests()
+                .antMatchers("/order/**").authenticated();//配置order访问控制，必须认证过后才可以访问
+       /* http.
                 anonymous().disable()
                 .authorizeRequests()
-                //.antMatchers("/users/**").authenticated()
+                .antMatchers("/api-docs/**","/oauth/**").permitAll()
+                //.antMatchers("/users/**").authenticated().
                 .antMatchers("/users/**").access("hasRole('ADMIN')")
-                .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());
+                .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());*/
     }
 
 }
