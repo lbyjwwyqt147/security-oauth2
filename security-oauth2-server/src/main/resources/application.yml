@@ -20,9 +20,15 @@ spring:
   # 数据源 配置
   datasource:
       platform: postgres
-      url: jdbc:postgresql://101.132.136.225:5432/cloud_oauth2?useUnicode=true&characterEncoding=utf-8
+      url: jdbc:postgresql://127.0.0.1:5432/cloud_oauth2?useUnicode=true&characterEncoding=utf-8
       username: postgres
       password: postgres123
       driver-class-name: org.postgresql.Driver
+
+  spring:
+    redis:
+      host: 127.0.0.1
+      database: 0
+
 
 logging.level.org.springframework.security: DEBUG
