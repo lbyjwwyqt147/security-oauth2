@@ -28,8 +28,7 @@ import javax.annotation.Resource;
 @EnableAuthorizationServer  //  注解开启验证服务器 提供/oauth/authorize,/oauth/token,/oauth/check_token,/oauth/confirm_access,/oauth/error
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
-    private static final String CLIEN_ID_ONE = "client_1";  //客户端1 用来标识客户的Id
-    private static final String CLIEN_ID_TWO = "client_2";  //客户端2
+    private static final String REDIRECT_URL = "http://baidu.com";
     private static final String CLIEN_ID_THREE = "client_3";  //客户端3
     private static final String CLIENT_SECRET = "secret";   //secret客户端安全码
     private static final String GRANT_TYPE_PASSWORD = "password";   // 密码模式授权模式
@@ -42,7 +41,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private static final String TRUST = "trust";
     private static final int ACCESS_TOKEN_VALIDITY_SECONDS = 1*60*60;          //
     private static final int FREFRESH_TOKEN_VALIDITY_SECONDS = 6*60*60;        //
-    private static final String RESOURCE_ID = "*";    //指定哪些资源是需要授权验证的
+    private static final String RESOURCE_ID = "users";    //指定哪些资源是需要授权验证的
 
 
     @Autowired
@@ -56,23 +55,15 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         String secret = new BCryptPasswordEncoder().encode(CLIENT_SECRET);  // 用 BCrypt 对密码编码
         //配置3个个客户端,一个用于password认证、一个用于client认证、一个用于authorization_code认证
         configurer.inMemory()  // 使用in-memory存储
-                .withClient(CLIEN_ID_ONE)    //client_id用来标识客户的Id  客户端1
+                .withClient(CLIEN_ID_THREE)    //client_id用来标识客户的Id  客户端3
                 .resourceIds(RESOURCE_ID)
-                .authorizedGrantTypes(GRANT_TYPE, REFRESH_TOKEN)  //允许授权类型   客户端授权模式
-                .scopes(SCOPE_READ,SCOPE_WRITE)  //允许授权范围
+                .authorizedGrantTypes(AUTHORIZATION_CODE,GRANT_TYPE, REFRESH_TOKEN,GRANT_TYPE_PASSWORD,IMPLICIT)  //允许授权类型
+                .scopes(SCOPE_READ,SCOPE_WRITE,TRUST)  //允许授权范围
                 .authorities("ROLE_CLIENT")  //客户端可以使用的权限
                 .secret(secret)  //secret客户端安全码
+                .redirectUris(REDIRECT_URL)  //指定可以接受令牌和授权码的重定向URIs
                 .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)   //token 时间秒
-                .refreshTokenValiditySeconds(FREFRESH_TOKEN_VALIDITY_SECONDS)//刷新token 时间 秒
-                .and()
-                .withClient(CLIEN_ID_TWO) //client_id用来标识客户的Id  客户端 2
-                .resourceIds(RESOURCE_ID)
-                .authorizedGrantTypes(GRANT_TYPE_PASSWORD, REFRESH_TOKEN)   //允许授权类型  密码授权模式
-                .scopes(SCOPE_READ,SCOPE_WRITE) //允许授权范围
-                .authorities("ROLE_CLIENT") //客户端可以使用的权限
-                .secret(secret)  //secret客户端安全码
-                .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)    //token 时间秒
-                .refreshTokenValiditySeconds(FREFRESH_TOKEN_VALIDITY_SECONDS); //刷新token 时间 秒
+                .refreshTokenValiditySeconds(FREFRESH_TOKEN_VALIDITY_SECONDS);//刷新token 时间 秒
 
     }
 
@@ -95,6 +86,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security
+                .realm(RESOURCE_ID)
                 .tokenKeyAccess("permitAll()")
                 .checkTokenAccess("isAuthenticated()") //isAuthenticated():排除anonymous   isFullyAuthenticated():排除anonymous以及remember-me
                 .allowFormAuthenticationForClients();  //允许表单认证

@@ -1,5 +1,5 @@
 server:
-  port: 18081
+  port: 18082
 
 spring:
   application:
@@ -29,6 +29,9 @@ spring:
     redis:
       host: 101.132.136.225
       database: 0
+
+  thymeleaf:
+      prefix: classpath:/static/
 
 
 logging.level.org.springframework.security: DEBUG

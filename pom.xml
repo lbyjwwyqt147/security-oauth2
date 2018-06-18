@@ -10,10 +10,11 @@
 
     <modules>
         <module>security-oauth2-server</module>
+        <module>security-oauth2-authorization-server</module>
     </modules>
 
     <name>security-oauth2</name>
-    <description>Demo project for Spring Boot</description>
+    <description>security-oauth2  认证服务</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -44,6 +45,11 @@
                 <artifactId>security-oauth2-server</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
+            <dependency>
+                <groupId>com.example.oauth</groupId>
+                <artifactId>security-oauth2-authorization-server</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+             </dependency>
         </dependencies>
     </dependencyManagement>
 

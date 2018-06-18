@@ -9,10 +9,10 @@
 3. security 配置  SecurityConfiguration
 
 ### oauth2 根据使用场景不同，分成了4种模式
-1. 授权码模式（authorization code）
-2. 简化模式（implicit）
-3. 密码模式（resource owner password credentials）
-4. 客户端模式（client credentials）
+1. 授权码模式（authorization code  即先登录获取code,再获取token）
+2. 简化模式（implicit 在redirect_uri 的Hash传递token; Auth客户端运行在浏览器中,如JS,Flash）
+3. 密码模式（ password 将用户名,密码传过去,直接获取token）
+4. 客户端模式（client credentials 无用户,用户向客户端注册,然后客户端以自己的名义向’服务端’获取资源）
 
 demo 中使用了密码授权模式 和客户端授权模式
 
