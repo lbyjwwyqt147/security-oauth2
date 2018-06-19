@@ -25,13 +25,15 @@ spring:
       password: postgres123
       driver-class-name: org.postgresql.Driver
 
-  spring:
-    redis:
-      host: 101.132.136.225
-      database: 0
+  redis:
+    host: 101.132.136.225
+    database: 0
 
   thymeleaf:
-      prefix: classpath:/static/
+      prefix: classpath:/static/pages/
 
 
-logging.level.org.springframework.security: DEBUG
+
+logging:
+  level:
+    org.springframework.security: DEBUG

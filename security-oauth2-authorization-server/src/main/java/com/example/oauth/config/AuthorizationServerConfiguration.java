@@ -62,6 +62,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .authorities("ROLE_CLIENT")  //客户端可以使用的权限
                 .secret(secret)  //secret客户端安全码
                 .redirectUris(REDIRECT_URL)  //指定可以接受令牌和授权码的重定向URIs
+                .autoApprove(true)
                 .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)   //token 时间秒
                 .refreshTokenValiditySeconds(FREFRESH_TOKEN_VALIDITY_SECONDS);//刷新token 时间 秒
 

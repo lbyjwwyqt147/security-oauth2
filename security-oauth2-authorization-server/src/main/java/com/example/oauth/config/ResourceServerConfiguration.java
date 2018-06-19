@@ -1,16 +1,22 @@
 package com.example.oauth.config;
 
 import com.example.oauth.config.handler.CustomAuthenticationEntryPoint;
+import com.example.oauth.config.handler.CustomLoginFailHandler;
+import com.example.oauth.config.handler.CustomLoginSuccessHandler;
 import com.example.oauth.config.handler.CustomLogoutSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 /***
@@ -30,17 +36,32 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     }
 
 
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
-                .antMatchers("/users/**").authenticated() //配置users访问控制，必须认证过后才可以访问
+                .antMatchers("/","/oauth/**","/loginPage","/logout/**","/home").permitAll()
+                //.antMatchers("/users/**").authenticated() //配置users访问控制，必须认证过后才可以访问
+                .antMatchers(HttpMethod.GET, "/api/**").access("#oauth2.hasScope('read')")
+                .antMatchers(HttpMethod.POST, "/api/**").access("#oauth2.hasScope('write')")
+                .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint())  //认证失败的业务处理
                 .and()
+                .formLogin()
+                .loginProcessingUrl("/login")
+                .loginPage("/loginPage")
+                .defaultSuccessUrl("/home")
+                .failureHandler(customLoginFailHandler())
+                .successHandler(customLoginSuccessHandler())
+                .permitAll()
+                .and()
                 .logout()
                 .logoutUrl("/oauth/logout")
-                .logoutSuccessHandler(customLogoutSuccessHandler());   //退出成功的业务处理
+                .logoutSuccessHandler(customLogoutSuccessHandler());
     }
 
 
@@ -54,4 +75,13 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         return new CustomAuthenticationEntryPoint();
     }
 
+    @Bean
+    public AuthenticationFailureHandler customLoginFailHandler(){
+        return new CustomLoginFailHandler();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler customLoginSuccessHandler(){
+        return new CustomLoginSuccessHandler();
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.oauth.config.handler;
 
+import com.example.oauth.utils.ResultUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -41,7 +44,10 @@ public class CustomLogoutSuccessHandler extends AbstractAuthenticationTargetUrlR
                 tokenStore.removeAccessToken(oAuth2AccessToken);
             }
         }
-
-        response.setStatus(HttpServletResponse.SC_OK);
+        Map<String,String> map =  new HashMap<>();
+        map.put("status","0");
+        map.put("message","退出系统.");
+        ResultUtil.writeJavaScript(response,map);
+       // response.setStatus(HttpServletResponse.SC_OK);
     }
 }

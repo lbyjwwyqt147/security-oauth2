@@ -1,0 +1,57 @@
+server:
+  port: 18083
+
+spring:
+  application:
+    name: oauth2-sso-client1   # 应用名称
+
+  jpa:
+      open-in-view: true
+      database: POSTGRESQL
+      show-sql: true
+      hibernate:
+        ddl-auto: update
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+      properties:
+        hibernate:
+          temp:
+            use_jdbc_metadata_defaults: false
+
+  # 数据源 配置
+  datasource:
+      platform: postgres
+      url: jdbc:postgresql://101.132.136.225:5432/cloud_oauth2?useUnicode=true&characterEncoding=utf-8
+      username: postgres
+      password: postgres123
+      driver-class-name: org.postgresql.Driver
+
+  redis:
+    host: 101.132.136.225
+    database: 0
+
+
+  thymeleaf:
+    prefix: classpath:/static/
+
+
+# sso　认证配置
+oauth2-server: http://localhost:18082
+
+security:
+  oauth2:
+    client.:
+      grant-type: client_credentials    # 客户端授权模式
+      client-id: client_3
+      client-secret: secret
+      access-token-uri: ${oauth2-server}/oauth/token
+      user-authorization-uri: ${oauth2-server}/oauth/authorize
+      scope: read,write
+    resource:
+      token-info-uri: ${oauth2-server}/oauth/check_token
+      user-info-uri: ${oauth2-server}/user
+      jwt:
+        key-uri: ${oauth2-server}/oauth/token_key
+
+logging:
+  level:
+    org.springframework.security: DEBUG

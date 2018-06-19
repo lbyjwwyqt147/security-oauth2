@@ -11,6 +11,7 @@
     <modules>
         <module>security-oauth2-server</module>
         <module>security-oauth2-authorization-server</module>
+        <module>oauth2-sso-client1</module>
     </modules>
 
     <name>security-oauth2</name>
@@ -50,6 +51,11 @@
                 <artifactId>security-oauth2-authorization-server</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
              </dependency>
+            <dependency>
+                <groupId>com.example.oauth</groupId>
+                <artifactId>oauth2-sso-client1</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
