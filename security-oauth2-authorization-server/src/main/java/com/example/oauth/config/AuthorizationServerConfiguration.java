@@ -1,5 +1,6 @@
 package com.example.oauth.config;
 
+import com.example.oauth.config.handler.CustomApprovalHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,12 +13,14 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 /***
@@ -28,7 +31,8 @@ import javax.annotation.Resource;
 @EnableAuthorizationServer  //  注解开启验证服务器 提供/oauth/authorize,/oauth/token,/oauth/check_token,/oauth/confirm_access,/oauth/error
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
-    private static final String REDIRECT_URL = "http://baidu.com";
+    //private static final String REDIRECT_URL = "http://localhost:18082/login";
+    private static final String REDIRECT_URL = "https://www.baidu.com/";
     private static final String CLIEN_ID_THREE = "client_3";  //客户端3
     private static final String CLIENT_SECRET = "secret";   //secret客户端安全码
     private static final String GRANT_TYPE_PASSWORD = "password";   // 密码模式授权模式
@@ -50,6 +54,15 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private UserDetailsService userDetailsService;
 
 
+    @Autowired
+    private AuthorizationEndpoint authorizationEndpoint;
+
+    @PostConstruct
+    public void init() {
+        authorizationEndpoint.setUserApprovalPage("forward:/oauth/my_approval_page");
+        authorizationEndpoint.setErrorPage("forward:/oauth/my_approval_error_page");
+    }
+
     @Override
     public void configure(ClientDetailsServiceConfigurer configurer) throws Exception {
         String secret = new BCryptPasswordEncoder().encode(CLIENT_SECRET);  // 用 BCrypt 对密码编码
@@ -62,7 +75,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .authorities("ROLE_CLIENT")  //客户端可以使用的权限
                 .secret(secret)  //secret客户端安全码
                 .redirectUris(REDIRECT_URL)  //指定可以接受令牌和授权码的重定向URIs
-                .autoApprove(true)
+                //.autoApprove(true) //用户不会被重定向到授权的页面，也不需要手动给请求授权
                 .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)   //token 时间秒
                 .refreshTokenValiditySeconds(FREFRESH_TOKEN_VALIDITY_SECONDS);//刷新token 时间 秒
 
@@ -74,7 +87,9 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .authenticationManager(authenticationManager).accessTokenConverter(accessTokenConverter())
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)  //支持GET  POST  请求获取token
                 .userDetailsService(userDetailsService) //必须注入userDetailsService否则根据refresh_token无法加载用户信息
-                .reuseRefreshTokens(true);  //开启刷新token
+                .reuseRefreshTokens(true) //开启刷新token
+                .userApprovalHandler(new CustomApprovalHandler());
+
     }
 
 

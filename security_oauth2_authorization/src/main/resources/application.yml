@@ -1,0 +1,37 @@
+server:
+  port: 18084
+
+spring:
+  application:
+    name: oauth2-server   # 应用名称
+
+  jpa:
+      open-in-view: true
+      database: POSTGRESQL
+      show-sql: true
+      hibernate:
+        ddl-auto: update
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+      properties:
+        hibernate:
+          temp:
+            use_jdbc_metadata_defaults: false
+
+  # 数据源 配置
+  datasource:
+      platform: postgres
+      url: jdbc:postgresql://101.132.136.225:5432/cloud_oauth2?useUnicode=true&characterEncoding=utf-8
+      username: postgres
+      password: postgres123
+      driver-class-name: org.postgresql.Driver
+
+  redis:
+    host: 101.132.136.225
+    database: 0
+
+  thymeleaf:
+        prefix: classpath:/templates/
+
+logging:
+  level:
+    org.springframework.security: DEBUG

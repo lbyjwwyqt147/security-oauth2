@@ -19,6 +19,7 @@ import java.util.Map;
 public class CustomLoginFailHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
+        log.info("================= 登录失败 =======================");
         Map<String,String> map =  new HashMap<>();
         map.put("status","1");
         log.info(e.getLocalizedMessage());

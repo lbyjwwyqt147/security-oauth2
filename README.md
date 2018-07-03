@@ -1,6 +1,7 @@
 # spring boot 2.0  security-oauth2
 
-### oauth2 原理
+### oauth2 authorization code 流程
+
 
 
 #### security oauth2 整合的3个核心配置类
@@ -300,6 +301,38 @@ public class UserServiceImpl implements UserDetailsService {
 6. /oauth/token_key：提供公有密匙的端点，如果你使用JWT令牌的话。
 7. /oauth/logout: 退出
 
+### 授权码模式
+
+1. 浏览器直接访问地址：http://localhost:18082/oauth/authorize?response_type=code&client_id=client_3&redirect_uri=http://baidu.com
+
+      client_id：第三方应用在授权服务器注册的 Id
+
+      response_type：固定值　code。
+
+      redirect_uri：授权服务器授权重定向哪儿的 URL。
+
+      scope：权限
+
+      state：随机字符串，可以省略
+2. 访问连接如果未登陆会跳转到登陆页面
+3. 登陆后进行授权认可
+4. 认可之后会得到一个code  https://www.baidu.com/?code=123456
+5. 携带code获取token 
+
+    http://localhost:18082/oauth/token?grant_type=authorization_code&code=123456&client_id=client_3&client_secret=secret&redirect_uri=http://baidu.com
+ 
+ 注意：code　只能用一次，如果失败需要重新申请
+ 
+ 返回：
+{
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiKiJdLCJ1c2VyX25hbWUiOiJxaWFvcnVsYWkiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTI5MjE4NjM2LCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl0sImp0aSI6ImQ2MjE5NDEyLTkxNDEtNDYyNi1iMjdiLWQ0M2ZhMGFkMTgzMSIsImNsaWVudF9pZCI6ImNsaWVudF8yIn0.2hsm_qXloexTLeEb1jtPOF6bIkiNYkBjg_Q2Azs9hxU",
+    "token_type": "bearer",
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiKiJdLCJ1c2VyX25hbWUiOiJxaWFvcnVsYWkiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiYXRpIjoiZDYyMTk0MTItOTE0MS00NjI2LWIyN2ItZDQzZmEwYWQxODMxIiwiZXhwIjoxNTI5MjM2NjM2LCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl0sImp0aSI6ImNhYWFmZTg3LWFhYzgtNDNkNC1iOTQyLTFkMDg3MDZhNjU3OSIsImNsaWVudF9pZCI6ImNsaWVudF8yIn0.Wb45Uv4aAae0AuSMttHs5XT6pJ45gGXVWUJBiWAU5UI",
+    "expires_in": 3599,
+    "scope": "read write",
+    "jti": "d6219412-9141-4626-b27b-d43fa0ad1831"
+}
+
 ### 客户端模式获取token
 
 client模式，没有用户的概念，不需要传递username和password 参数，直接与认证服务器交互，用配置中的客户端信息去申请accessToken，客户端有自己的client_id,client_secret对应于用户的username,password，而客户端也拥有自己的authorities，当采取client模式认证时，对应的权限也就是客户端自己的authorities。
@@ -388,3 +421,5 @@ password模式，在认证时需要带上自己的用户名和密码，需要传
     "error": "invalid_token",
     "error_description": "Access token expired: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiKiJdLCJ1c2VyX25hbWUiOiJxaWFvcnVsYWkiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTI5MjE4NzM5LCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl0sImp0aSI6IjAzMjc5NDM5LWNjYjYtNGI3My1iODM4LTgwNTA5YjVkNWFjNiIsImNsaWVudF9pZCI6ImNsaWVudF8yIn0.vwXCxlLRKLbqnWm6HuqAVO0j2YzSn1oHQ-GX4LZkEx8"
 }
+
+参考：http://websystique.com/spring-security/secure-spring-rest-api-using-oauth2/

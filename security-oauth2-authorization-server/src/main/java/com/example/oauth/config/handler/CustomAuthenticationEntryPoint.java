@@ -18,9 +18,12 @@ import java.util.Map;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        log.info("      ========================================= 身份认证失败..................... ");
+        log.info("请求url：" +httpServletRequest.getRequestURI());
+        log.info("  ============ 身份认证失败..................... ");
+        log.info(e.getMessage());
+        log.info(e.getLocalizedMessage());
         Map<String,String> map =  new HashMap<>();
-        map.put("status","401");
+        map.put("status","403");
         map.put("message","Access Denied.");
         ResultUtil.writeJavaScript(httpServletResponse,map);
        // httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Access Denied");

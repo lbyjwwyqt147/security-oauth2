@@ -2,6 +2,7 @@ package com.example.oauth.service.impl;
 
 import com.example.oauth.entity.SysAccount;
 import com.example.oauth.repository.SysAccountRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Service(value = "userService")
 public class UserServiceImpl implements UserDetailsService {
 
@@ -21,7 +23,8 @@ public class UserServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         SysAccount user = repository.findByUserAccount(username);
         if(user == null){
-            throw new UsernameNotFoundException("Invalid username or password.");
+            log.info("登录用户【"+username + "】不存在.");
+            throw new UsernameNotFoundException("登录用户【"+username + "】不存在.");
         }
         return new org.springframework.security.core.userdetails.User(user.getUserAccount(), user.getUserPwd(), getAuthority());
     }

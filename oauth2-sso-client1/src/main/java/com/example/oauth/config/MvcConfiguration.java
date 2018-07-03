@@ -1,17 +1,18 @@
 package com.example.oauth.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.*;
 
 @Configuration
-public class MvcConfiguration extends WebMvcConfigurerAdapter {
+@EnableWebMvc
+public class MvcConfiguration implements  WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("login").setViewName("login");
-        registry.addViewController("/").setViewName("index");
         registry.addViewController("/index").setViewName("index");
+        registry.addViewController("/login").setViewName("redirect:http://localhost:18082/login");
+        registry.addViewController("/securedPage");
     }
+
+
 }

@@ -1,6 +1,12 @@
 package com.example.oauth.controller;
 
+import com.alibaba.fastjson.JSON;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import sun.plugin.liveconnect.SecurityContextHelper;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -24,6 +30,7 @@ public class UserController {
     @GetMapping("/user")
     public Principal user(Principal user){
         System.out.println(".. 进入　获取用户信息　方法   ..........  ");
+        System.out.println(JSON.toJSONString(user));
         return user;
     }
 
@@ -31,7 +38,7 @@ public class UserController {
 
 
     @RequestMapping(path = "api/messages", method = RequestMethod.GET)
-    List<String> getMessages(Principal principal) {
+    public List<String> getMessages(Principal principal) {
         List<String> list = new LinkedList<>();
         list.add("俏如来");
         list.add("帝如来");
@@ -40,8 +47,19 @@ public class UserController {
     }
 
     @RequestMapping(path = "api/messages", method = RequestMethod.POST)
-    String postMessage(Principal principal) {
-
+   public String postMessage(Principal principal) {
         return "POST -> 默苍离 ";
     }
+
+    /**
+     * 当前登录人信息
+     * @return
+     */
+    @RequestMapping(path = "api/user", method = RequestMethod.GET)
+    public UserDetails currentlyLoginUser(){
+         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+         return  userDetails;
+    }
+
+
 }

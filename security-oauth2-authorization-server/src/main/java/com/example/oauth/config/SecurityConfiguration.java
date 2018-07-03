@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
 
 import javax.annotation.Resource;
@@ -25,6 +26,9 @@ import javax.annotation.Resource;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private SimpleCORSFilter corsControllerFilter;
 
     @Resource(name = "userService")
     private UserDetailsService userDetailsService;
@@ -45,21 +49,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         //解决静态资源被拦截的问题
         web.ignoring().antMatchers("/assets/**");
+        web.ignoring().antMatchers("/favicon.ico");
+
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.csrf().disable()
-                .requestMatchers().anyRequest()
-                .and()
                 .authorizeRequests()
-                .antMatchers("/","/oauth/**","/loginPage","/logout/**").permitAll()
+                .antMatchers("/","/login", "/oauth/**","/home").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler())
                 .and()
                 .formLogin()
                 .permitAll();
+        http.addFilterBefore(corsControllerFilter, SecurityContextPersistenceFilter.class);
+
     }
 
 

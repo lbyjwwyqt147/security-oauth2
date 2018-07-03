@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Approval</title>
+    <link href="../assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="../assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
+    <link href="../assets/global/css/components.min.css" rel="stylesheet" id="style_components" type="text/css" />
+    <link href="../assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
+    <link href="../assets/layouts/layout/css/layout.min.css" rel="stylesheet" type="text/css">
+    <link href="../assets/layouts/layout/css/themes/darkblue.min.css" rel="stylesheet" type="text/css" id="style_color">
+    <link href="../assets/layouts/layout/css/custom.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="page-header-fixed page-sidebar-closed-hide-logo page-content-white page-content">
+
+<div class="row" style="margin-top: 5%;margin-left: 20%" >
+    <div class="col-md-6">
+
+      <!--  <form id='confirmationForm' name='confirmationForm'
+              action='${pageContext.request.contextPath}/oauth/authorize'
+              method='post'>
+            <input name='user_oauth_approval' value='true' type='hidden' /> <input
+                name='authorize' value='Authorize' type='submit'
+                class="btn btn-success" />
+        </form>
+        <form id='denialForm' name='denialForm'
+              action='${pageContext.request.contextPath}/oauth/authorize'
+              method='post'>
+            <input name='user_oauth_approval' value='false' type='hidden' /> <input
+                name='deny' value='Deny' type='submit' class="btn btn-warning" />
+        </form>
+-->
+
+
+        <div class="portlet box blue " style="border-top: 1px solid #60aee4">
+
+            <div class="portlet-body form" style="padding-left: 10px">
+                <br>
+                <h1 class="page-title" style="margin-left: 15px;">
+                    你是否授权client_id=client_3访问你的受保护资源?
+                </h1>
+
+                <form class="form-horizontal" role="form">
+                    <div class="form-body" style="margin-left: 15px;">
+                        <div class="form-group">
+                            <label>资源权限</label>
+                            <div class="mt-checkbox-list">
+                                <label class="mt-checkbox mt-checkbox-outline">
+                                    <input type="checkbox" value="1" name="test">资源1
+                                    <span></span>
+                                </label>
+                                <label class="mt-checkbox mt-checkbox-outline"> 资源2
+                                    <input type="checkbox" value="1" name="test">
+                                    <span></span>
+                                </label>
+                                <label class="mt-checkbox mt-checkbox-outline"> 资源3
+                                    <input type="checkbox" value="1" name="test">
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <div class="row">
+                            <div class="col-md-offset-4 col-md-8">
+                                <button type="button" id="authorize_btn" class="btn green mt-ladda-btn ladda-button btn-circle btn-outline" data-style="slide-up" data-spinner-color="#333">
+                                                        <span class="ladda-label">
+                                                            <i class="fa fa-check"></i> 授权</span>
+                                    <span class="ladda-spinner"></span></button>
+
+                                <button type="button" id="deny_btn" class="btn red mt-ladda-btn ladda-button btn-circle btn-outline" data-style="slide-up" data-spinner-color="#333">
+                                                        <span class="ladda-label">
+                                                            <i class="fa fa-ban"></i> 拒绝</span>
+                                    <span class="ladda-spinner"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="../assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+<script src="../assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="../assets/global/plugins/js.cookie.min.js" type="text/javascript"></script>
+<script src="../assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js" type="text/javascript"></script>
+<script src="../assets/global/plugins/jquery.blockui.min.js" type="text/javascript"></script>
+<script src="../assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js" type="text/javascript"></script>
+<script src="../assets/global/plugins/backstretch/jquery.backstretch.min.js" type="text/javascript"></script>
+<script src="../assets/global/scripts/app.min.js" type="text/javascript"></script>
+<script src="../assets/layouts/layout/scripts/layout.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+    jQuery(document).ready(function() {
+　　　　var authorize_url = "http://localhost:18082/oauth/authorize";
+        //授权按钮点击事件
+        $("#authorize_btn").click(function(){
+            $.ajax({
+                url:authorize_url,
+                data:{
+                    user_oauth_approval:true,
+                    authorize:"Authorize"
+                },
+                type:'post',
+                dataType:'json',
+                success:function(res){
+                    console.log(res);
+
+
+                }
+            })
+        });
+
+        //拒绝按钮点击事件
+        $("#deny_btn").click(function(){
+            $.ajax({
+                url:authorize_url,
+                data:{
+                    user_oauth_approval:false,
+                    authorize:"Deny"
+                },
+                type:'post',
+                dataType:'json',
+                success:function(res){
+                    console.log(res);
+                }
+            })
+        });
+
+
+    });
+
+</script>
+
+
+</body>
+</html>

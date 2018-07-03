@@ -9,7 +9,6 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 
 @SpringBootApplication
-@EnableOAuth2Sso
 public class Oauth2SsoClient1Application {
 
     @Bean

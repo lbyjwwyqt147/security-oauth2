@@ -74,7 +74,9 @@ var Login = function () {
 					success:function(res){
 						console.log(res);
 						if(res.status == 0){
-							window.location.href = 'http://localhost:18082/home'
+							var c = "http://localhost:18082/oauth/authorize?response_type=code&client_id=client_3&redirect_uri=https://www.baidu.com/";
+							 window.location.href = 'http://localhost:18082/home'
+                            //window.location.href = 'http://localhost:18082/oauth/my_approval_page';
 						}
 					}
 				})
