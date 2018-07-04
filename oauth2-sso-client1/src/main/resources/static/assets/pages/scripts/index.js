@@ -1,5 +1,6 @@
 var Index = function () {
-    var authorize_url = "http://localhost:18082/oauth/authorize?response_type=code&client_id=client_3&redirect_uri=http://localhost:18082/login";
+    var authorize_url = "http://localhost:18082/oauth/authorize?response_type=code&client_id=client_3&redirect_uri=http://localhost:18082/home";
+    var access_token = "";
 	var handleIndex = function() {
         //请求授权点击事件
 
@@ -45,8 +46,9 @@ var Index = function () {
 	};
     var requestAdditionalResources = function () {
        // window.open(authorize_url);
-
-        layer.open({
+       // window.open(authorize_url);
+        window.open("http://localhost:18082/home");
+      /*  layer.open({
             type: 2,
             title: false,
             closeBtn: 0, //不显示关闭按钮
@@ -59,7 +61,7 @@ var Index = function () {
             end: function(){ //此处用于演示
 
             }
-        });
+        });*/
         /*   $.ajax({
                url:authorize_url,
                type:'post',
@@ -79,8 +81,12 @@ var Index = function () {
            });*/
     };
     var getUserInfo = function () {
+
         $.ajax({
             url:"http://localhost:18082/api/user",
+            data:{
+                "access_token":access_token
+            },
             type:'get',
             dataType:'json',
             withCredentials: true,
@@ -98,7 +104,23 @@ var Index = function () {
                 console.log(xhr);
                 console.log(status);
                 console.log(error);
+               // window.location.href="http://localhost:18082/login";
                 toastr.error("请求获取其他服务登录人信息接口出错.");
+            }
+        });
+    };
+    var getToken = function(){
+        $.ajax({
+            url:" http://127.0.0.1:18082/oauth/token?grant_type=client_credentials&client_id=client_3&client_secret=secret",
+            type:'get',
+            dataType:'json',
+            withCredentials: true,
+            success:function(data,textStatus,XMLHttpRequest){
+                console.log(data);
+                access_token = data.access_token;
+            },
+            error:function(xhr,status,error){
+                toastr.error("请求获取token出现错误.");
             }
         });
     }
@@ -107,6 +129,7 @@ var Index = function () {
         //main function to initiate the module
         init: function () {
             handleIndex();
+            getToken();
         },
         authorization:function(){
             requestAdditionalResources();

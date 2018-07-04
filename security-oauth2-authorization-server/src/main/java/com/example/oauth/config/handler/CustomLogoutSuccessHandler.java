@@ -24,14 +24,14 @@ public class CustomLogoutSuccessHandler extends AbstractAuthenticationTargetUrlR
     private static final String BEARER_AUTHENTICATION = "Bearer ";
     private static final String HEADER_AUTHORIZATION = "authorization";
 
-    @Autowired
-    private TokenStore tokenStore ;
+   /* @Autowired
+    private TokenStore tokenStore ;*/
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info(" =================  成功退出系统 .... ");
         String access_token = request.getParameter("access_token");
-        if(access_token != null){
+     /*   if(access_token != null){
             OAuth2AccessToken oAuth2AccessToken = tokenStore.readAccessToken(access_token);
             log.info("token =" +oAuth2AccessToken.getValue());
             tokenStore.removeAccessToken(oAuth2AccessToken);
@@ -43,7 +43,7 @@ public class CustomLogoutSuccessHandler extends AbstractAuthenticationTargetUrlR
                 log.info("token =" +oAuth2AccessToken.getValue());
                 tokenStore.removeAccessToken(oAuth2AccessToken);
             }
-        }
+        }*/
         Map<String,String> map =  new HashMap<>();
         map.put("status","0");
         map.put("message","退出系统.");

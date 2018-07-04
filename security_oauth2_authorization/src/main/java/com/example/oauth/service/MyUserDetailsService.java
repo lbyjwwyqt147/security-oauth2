@@ -28,7 +28,8 @@ public class MyUserDetailsService implements UserDetailsService {
         Collection<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority("admin"));
         PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        User user = new User("admin",passwordEncoder.encode("123456"),authorities);
+        String pwd = passwordEncoder.encode("123456");
+        User user = new User("admin",pwd,authorities);
         return user;
     }
 }

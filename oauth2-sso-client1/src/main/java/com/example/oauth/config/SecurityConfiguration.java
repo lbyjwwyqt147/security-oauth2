@@ -1,16 +1,13 @@
 package com.example.oauth.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -32,34 +29,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/","/login", "/oauth/**","/home","/index").permitAll()
+                .antMatchers("/login", "/oauth/**","/home","/index").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler())
                 .and()
                 .formLogin()
                 .permitAll();
     }
-
-  /*  @Override
-    protected void configure(HttpSecurity http) throws Exception {
-
-        http.antMatcher("/**")
-                .authorizeRequests()
-                .antMatchers("/", "/login","/index")
-                .permitAll()
-                .anyRequest()
-                .authenticated();
-
-       *//* http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/","/oauth/**","/index","/logout/**","/home","/login").permitAll()
-                .and()
-                .formLogin().loginPage("/index")
-                .and()
-                .logout()
-                .logoutSuccessUrl(oauthServerUrl)
-                .and().authorizeRequests().anyRequest().authenticated();*//*
-    }*/
-
-
 }

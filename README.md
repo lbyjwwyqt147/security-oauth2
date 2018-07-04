@@ -1,7 +1,12 @@
 # spring boot 2.0  security-oauth2
 
-### oauth2 authorization code 流程
-
+### oauth2 authorization code 大致流程
+1. 用户打开客户端以后，客户端要求用户给予授权。
+2. 用户同意给予客户端授权。
+3. 客户端使用上一步获得的授权，向认证服务器申请令牌。
+4. 认证服务器对客户端进行认证以后，确认无误，同意发放令牌。
+5. 客户端使用令牌，向资源服务器申请获取资源。
+6. 资源服务器确认令牌无误，同意向客户端开放资源。
 
 
 #### security oauth2 整合的3个核心配置类
@@ -315,12 +320,13 @@ public class UserServiceImpl implements UserDetailsService {
 
       state：随机字符串，可以省略
 2. 访问连接如果未登陆会跳转到登陆页面
-3. 登陆后进行授权认可
-4. 认可之后会得到一个code  https://www.baidu.com/?code=123456
+3. 输入数据库中账号和密码登陆后进行授权认可界面 点击“approve” 同意授权获取code返回：https://www.baidu.com/?code=lqByMd&state=123
+    点击“deny” 拒绝授权 返回：https://www.baidu.com/?error=access_denied&error_description=User%20denied%20access&state=123
+4. 授权之后会得到一个code  https://www.baidu.com/?code=123456
 5. 携带code获取token 
 
     http://localhost:18082/oauth/token?grant_type=authorization_code&code=123456&client_id=client_3&client_secret=secret&redirect_uri=http://baidu.com
- 
+ 如果出现登陆框这输入账号：client_3 密码 secret 登陆即可获取token信息
  注意：code　只能用一次，如果失败需要重新申请
  
  返回：

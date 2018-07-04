@@ -11,10 +11,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Order(10)
 @Configuration
@@ -33,37 +31,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/","login","/health", "/css/**","/oauth/**","/favicon.ico").permitAll()
+                .antMatchers("/","/oauth/**","/login","/health", "/css/**").permitAll()
                 .anyRequest().authenticated()
-                .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler())
                 .and()
                 .formLogin()
-                 .loginPage("/login")
-                .successHandler(customLoginSuccessHandler())
-                .failureHandler(customLoginFailHandler())
+                .loginPage("/login")
                 .permitAll();
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsFitService).passwordEncoder(bCryptPasswordEncoder());
-        //auth.parentAuthenticationManager(authenticationManagerBean());
-    }
-
-
-    @Bean
-    public AuthenticationFailureHandler customLoginFailHandler(){
-        return new CustomLoginFailHandler();
+        auth.userDetailsService(userDetailsFitService).passwordEncoder(passwordEncoder());
+        auth.parentAuthenticationManager(authenticationManagerBean());
     }
 
     @Bean
-    public AuthenticationSuccessHandler customLoginSuccessHandler(){
-        return new CustomLoginSuccessHandler();
-    }
-
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
+    public PasswordEncoder passwordEncoder(){
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
 }

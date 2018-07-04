@@ -31,7 +31,7 @@ import java.util.Set;
  * 自定义 oauth2 授权页面
  */
 @Controller
-@SessionAttributes("authorizationRequest")
+//@SessionAttributes("authorizationRequest")
 public class OAuth2ApprovalController {
 
     @RequestMapping("/oauth/my_approval_page")
@@ -62,60 +62,4 @@ public class OAuth2ApprovalController {
         return "oauth_error";
     }
 
-
-
-    @RequestMapping(
-            value = {"/oauth/authorize"},
-            method = {RequestMethod.POST},
-            params = {"user_oauth_approval"}
-    )
-    public View approveOrDeny(@RequestParam Map<String, String> approvalParameters, Map<String, ?> model, SessionStatus sessionStatus, Principal principal,HttpServletRequest request) {
-        System.out.println( SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        SecurityContextImpl securityContextImpl = (SecurityContextImpl) request
-                .getSession().getAttribute("SPRING_SECURITY_CONTEXT");
-        System.out.println("Username:"
-                + securityContextImpl.getAuthentication().getName());
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        //principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!(principal instanceof Authentication)) {
-            sessionStatus.setComplete();
-            throw new InsufficientAuthenticationException("User must be authenticated with Spring Security before authorizing an access token.");
-        } else {
-            AuthorizationRequest authorizationRequest = (AuthorizationRequest)model.get("authorizationRequest");
-            if (authorizationRequest == null) {
-                sessionStatus.setComplete();
-                throw new InvalidRequestException("Cannot approve uninitialized authorization request.");
-            } else {
-                View var8 = null;
-           /*     try {
-                    Set<String> responseTypes = authorizationRequest.getResponseTypes();
-                    authorizationRequest.setApprovalParameters(approvalParameters);
-                    authorizationRequest = this.userApprovalHandler.updateAfterApproval(authorizationRequest, (Authentication)principal);
-                    boolean approved = this.userApprovalHandler.isApproved(authorizationRequest, (Authentication)principal);
-                    authorizationRequest.setApproved(approved);
-                    if (authorizationRequest.getRedirectUri() == null) {
-                        sessionStatus.setComplete();
-                        throw new InvalidRequestException("Cannot approve request when no redirect URI is provided.");
-                    }
-
-                    if (!authorizationRequest.isApproved()) {
-                        RedirectView var12 = new RedirectView(this.getUnsuccessfulRedirect(authorizationRequest, new UserDeniedAuthorizationException("User denied access"), responseTypes.contains("token")), false, true, false);
-                        return var12;
-                    }
-
-                    if (responseTypes.contains("token")) {
-                        var8 = this.getImplicitGrantResponse(authorizationRequest).getView();
-                        return var8;
-                    }
-
-                    var8 = this.getAuthorizationCodeResponse(authorizationRequest, (Authentication)principal);
-                } finally {
-                    sessionStatus.setComplete();
-                }*/
-
-                return var8;
-            }
-        }
-    }
 }

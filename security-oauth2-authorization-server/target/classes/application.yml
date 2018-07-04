@@ -33,13 +33,6 @@ spring:
       prefix: classpath:/static/pages/
 
 
-  security:
-    user:
-      name: qiaorulai
-      password: 123456
-
-
-
 logging:
   level:
     org.springframework.security: DEBUG

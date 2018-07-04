@@ -8,11 +8,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
@@ -22,6 +25,8 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 /***
  *  身份授权认证服务配置
@@ -45,23 +50,13 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private static final String TRUST = "trust";
     private static final int ACCESS_TOKEN_VALIDITY_SECONDS = 1*60*60;          //
     private static final int FREFRESH_TOKEN_VALIDITY_SECONDS = 6*60*60;        //
-    private static final String RESOURCE_ID = "users";    //指定哪些资源是需要授权验证的
+    private static final String RESOURCE_ID = "user";    //指定哪些资源是需要授权验证的
 
 
     @Autowired
     private AuthenticationManager authenticationManager;   //认证方式
     @Resource(name = "userService")
     private UserDetailsService userDetailsService;
-
-
-    @Autowired
-    private AuthorizationEndpoint authorizationEndpoint;
-
-    @PostConstruct
-    public void init() {
-        authorizationEndpoint.setUserApprovalPage("forward:/oauth/my_approval_page");
-        authorizationEndpoint.setErrorPage("forward:/oauth/my_approval_error_page");
-    }
 
     @Override
     public void configure(ClientDetailsServiceConfigurer configurer) throws Exception {
@@ -74,8 +69,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .scopes(SCOPE_READ,SCOPE_WRITE,TRUST)  //允许授权范围
                 .authorities("ROLE_CLIENT")  //客户端可以使用的权限
                 .secret(secret)  //secret客户端安全码
-                .redirectUris(REDIRECT_URL)  //指定可以接受令牌和授权码的重定向URIs
-                //.autoApprove(true) //用户不会被重定向到授权的页面，也不需要手动给请求授权
+                //.redirectUris(REDIRECT_URL)  //指定可以接受令牌和授权码的重定向URIs
+               // .autoApprove(true) // 为true 则不会被重定向到授权的页面，也不需要手动给请求授权,直接自动授权成功返回code
                 .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)   //token 时间秒
                 .refreshTokenValiditySeconds(FREFRESH_TOKEN_VALIDITY_SECONDS);//刷新token 时间 秒
 
@@ -83,12 +78,11 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.tokenStore(tokenStore())
-                .authenticationManager(authenticationManager).accessTokenConverter(accessTokenConverter())
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)  //支持GET  POST  请求获取token
+        //endpoints.tokenStore(tokenStore())
+        endpoints.authenticationManager(authenticationManager).accessTokenConverter(accessTokenConverter())
                 .userDetailsService(userDetailsService) //必须注入userDetailsService否则根据refresh_token无法加载用户信息
-                .reuseRefreshTokens(true) //开启刷新token
-                .userApprovalHandler(new CustomApprovalHandler());
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)  //支持GET  POST  请求获取token
+                .reuseRefreshTokens(true); //开启刷新token
 
     }
 
@@ -105,7 +99,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .realm(RESOURCE_ID)
                 .tokenKeyAccess("permitAll()")
                 .checkTokenAccess("isAuthenticated()") //isAuthenticated():排除anonymous   isFullyAuthenticated():排除anonymous以及remember-me
-                .allowFormAuthenticationForClients();  //允许表单认证
+                .allowFormAuthenticationForClients();  //允许表单认证  这段代码在授权码模式下会导致无法根据code　获取token　
     }
 
 
@@ -113,7 +107,19 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+        JwtAccessTokenConverter converter = new JwtAccessTokenConverter() {
+            @Override
+            public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
+                if(authentication.getUserAuthentication() != null){
+                    String userName = authentication.getUserAuthentication().getName();
+                    final Map<String, Object> additionalInformation = new HashMap<>();
+                    additionalInformation.put("user_name", userName);
+                    ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInformation);
+                }
+                OAuth2AccessToken token = super.enhance(accessToken, authentication);
+                return token;
+            }
+        };
         converter.setSigningKey("bcrypt");
         return converter;
     }
@@ -125,11 +131,4 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         return new JwtTokenStore(accessTokenConverter());
     }
 
-    @Bean
-    public ResourceServerTokenServices tokenService() {
-        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        defaultTokenServices.setTokenStore(tokenStore());
-        defaultTokenServices.setSupportRefreshToken(true);
-        return defaultTokenServices;
-    }
 }
