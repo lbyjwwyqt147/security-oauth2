@@ -7,6 +7,7 @@ import com.example.oauth.config.handler.CustomLogoutSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,6 +15,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -27,22 +29,28 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 @EnableResourceServer   //注解来开启资源服务器
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
-    private static final String RESOURCE_ID = "user";
-  /*  @Autowired
-    private ResourceServerTokenServices tokenServices;*/
+    private static final String RESOURCE_ID = "resource_id";
+    @Autowired
+    private DefaultTokenServices tokenServices;
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
-       // resources.resourceId(RESOURCE_ID).stateless(false).tokenServices(tokenServices);
-        resources.resourceId(RESOURCE_ID).stateless(true);
+        resources.resourceId(RESOURCE_ID).stateless(true).tokenServices(tokenServices);
     }
 
 
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
+        // 配置那些资源需要保护的
+        http.requestMatchers().antMatchers("/api/**")
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/**").authenticated()
+                .and()
+                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint());
 
-        http.csrf().disable()
+        /*http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/oauth/**","/login","/home").permitAll()
                 .anyRequest().authenticated()
@@ -54,7 +62,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .loginPage("/login")
                 .failureHandler(customLoginFailHandler())
                 .successHandler(customLoginSuccessHandler())
-                .permitAll();
+                .permitAll();*/
 
        /* http.csrf().disable()
                 .authorizeRequests()
@@ -86,10 +94,6 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         return new CustomLogoutSuccessHandler();
     }
 
-    @Bean
-    public AuthenticationEntryPoint customAuthenticationEntryPoint(){
-        return new CustomAuthenticationEntryPoint();
-    }
 
     @Bean
     public AuthenticationFailureHandler customLoginFailHandler(){

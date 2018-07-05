@@ -1,5 +1,5 @@
 var Index = function () {
-    var authorize_url = "http://localhost:18082/oauth/authorize?response_type=code&client_id=client_3&redirect_uri=http://localhost:18082/home";
+    var authorize_url = "http://localhost:18082/oauth/authorize?response_type=code&client_id=client_3&redirect_uri=http://localhost:18083/index";
     var access_token = "";
 	var handleIndex = function() {
         //请求授权点击事件
@@ -46,7 +46,7 @@ var Index = function () {
 	};
     var requestAdditionalResources = function () {
        // window.open(authorize_url);
-       // window.open(authorize_url);
+        //window.open(authorize_url);
         window.open("http://localhost:18082/home");
       /*  layer.open({
             type: 2,
@@ -110,8 +110,9 @@ var Index = function () {
         });
     };
     var getToken = function(){
+        //密码 模式获取token
         $.ajax({
-            url:" http://127.0.0.1:18082/oauth/token?grant_type=client_credentials&client_id=client_3&client_secret=secret",
+            url:"127.0.0.1:18081/oauth/token?username=qiaorulai&password=123456&grant_type=password&client_id=client_3&client_secret=secret",
             type:'get',
             dataType:'json',
             withCredentials: true,
@@ -129,7 +130,7 @@ var Index = function () {
         //main function to initiate the module
         init: function () {
             handleIndex();
-            getToken();
+            //getToken();
         },
         authorization:function(){
             requestAdditionalResources();

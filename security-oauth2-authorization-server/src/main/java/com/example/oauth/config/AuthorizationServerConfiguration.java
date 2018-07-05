@@ -1,6 +1,5 @@
 package com.example.oauth.config;
 
-import com.example.oauth.config.handler.CustomApprovalHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,17 +15,15 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /***
  *  身份授权认证服务配置
@@ -50,7 +47,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private static final String TRUST = "trust";
     private static final int ACCESS_TOKEN_VALIDITY_SECONDS = 1*60*60;          //
     private static final int FREFRESH_TOKEN_VALIDITY_SECONDS = 6*60*60;        //
-    private static final String RESOURCE_ID = "user";    //指定哪些资源是需要授权验证的
+    private static final String RESOURCE_ID = "resource_id";    //指定哪些资源是需要授权验证的
 
 
     @Autowired
@@ -78,11 +75,12 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        //endpoints.tokenStore(tokenStore())
-        endpoints.authenticationManager(authenticationManager).accessTokenConverter(accessTokenConverter())
+        endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager)
+                .accessTokenConverter(accessTokenConverter())
                 .userDetailsService(userDetailsService) //必须注入userDetailsService否则根据refresh_token无法加载用户信息
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)  //支持GET  POST  请求获取token
-                .reuseRefreshTokens(true); //开启刷新token
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST,HttpMethod.OPTIONS)  //支持GET  POST  请求获取token
+                .reuseRefreshTokens(true) //开启刷新token
+                .tokenServices(tokenServices());
 
     }
 
@@ -108,10 +106,19 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter() {
+            /**
+             * 自定义一些token返回的信息
+             * @param accessToken
+             * @param authentication
+             * @return
+             */
             @Override
             public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-                if(authentication.getUserAuthentication() != null){
+                String grantType = authentication.getOAuth2Request().getGrantType();
+                //只有如下两种模式才能获取到当前用户信息
+                if("authorization_code".equals(grantType) || "password".equals(grantType)) {
                     String userName = authentication.getUserAuthentication().getName();
+                    // 自定义一些token 信息 会在获取token返回结果中展示出来
                     final Map<String, Object> additionalInformation = new HashMap<>();
                     additionalInformation.put("user_name", userName);
                     ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInformation);
@@ -129,6 +136,20 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     public TokenStore tokenStore() {
         //基于jwt实现令牌（Access Token）
         return new JwtTokenStore(accessTokenConverter());
+    }
+
+    /**
+     * 重写默认的资源服务token
+     * @return
+     */
+    @Bean
+    public DefaultTokenServices tokenServices() {
+        final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+        defaultTokenServices.setTokenEnhancer(accessTokenConverter());
+        defaultTokenServices.setTokenStore(tokenStore());
+        defaultTokenServices.setSupportRefreshToken(true);
+        defaultTokenServices.setAccessTokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30)); // 30天
+        return defaultTokenServices;
     }
 
 }

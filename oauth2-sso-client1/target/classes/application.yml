@@ -46,19 +46,18 @@ security:
   oauth2:
     client:
      # grant-type: client_credentials    # 授权模式
-      client-id: client_3
-      client-secret: secret
-      access-token-uri: ${oauth2-server}/oauth/token
-      user-authorization-uri: ${oauth2-server}/oauth/authorize
+      client-id: client_3        # 在oauth 服务端注册的client-id
+      client-secret: secret     # 在oauth 服务端注册的secret
+      access-token-uri: ${oauth2-server}/oauth/token    #获取token 地址
+      user-authorization-uri: ${oauth2-server}/oauth/authorize  # 认证地址
       scope: read,write
-      authorities: ROLE_CLIENT
     resource:
-      token-info-uri: ${oauth2-server}/oauth/check_token
-      user-info-uri: ${oauth2-server}/user
+      token-info-uri: ${oauth2-server}/oauth/check_token  # 检查token
+      user-info-uri: ${oauth2-server}/api/user   # 用户信息
       jwt:
         key-uri: ${oauth2-server}/oauth/token_key
     sso:
-      login-path: /login
+      login-path: /login   # 重定向的地址 ip和端口会自动加上  ip和端口是当前服务的ip和端口
 
 
 

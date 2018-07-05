@@ -16,18 +16,7 @@ import java.util.List;
 @RestController
 public class UserController {
 
-    @GetMapping(value = "users/list")
-    public String listUser(){
-        return "user";
-    }
-
-    @GetMapping(value = "opt/list")
-    public String optList(){
-        return "optList";
-    }
-
-
-    @GetMapping("/user")
+    @GetMapping("api/user")
     public Principal user(Principal user){
         System.out.println(".. 进入　获取用户信息　方法   ..........  ");
         System.out.println(JSON.toJSONString(user));
@@ -55,7 +44,7 @@ public class UserController {
      * 当前登录人信息
      * @return
      */
-    @RequestMapping(path = "api/user", method = RequestMethod.GET)
+    @RequestMapping(path = "api/loginUser", method = RequestMethod.GET)
     public UserDetails currentlyLoginUser(){
          UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
          return  userDetails;
