@@ -1,5 +1,6 @@
 package com.example.oauth.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Configuration;
@@ -8,11 +9,15 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableOAuth2Sso  //@EnableOAuth2Sso注解来开启SSO
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private SimpleCORSFilter simpleCORSFilter;
 
     @Value("${oauth2-server}")
     private String oauthServerUrl;
@@ -35,5 +40,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()
                 .permitAll();
+        http.addFilterBefore(simpleCORSFilter,SecurityContextPersistenceFilter.class);
     }
 }

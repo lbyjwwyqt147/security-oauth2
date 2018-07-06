@@ -32,6 +32,10 @@ spring:
   thymeleaf:
       prefix: classpath:/static/pages/
 
+# 不需要拦截的url地址
+mySecurity:
+  exclude:
+    antMatchers: /oauth/**,/login,/home
 
 logging:
   level:

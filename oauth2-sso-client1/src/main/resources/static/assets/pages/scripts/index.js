@@ -104,8 +104,9 @@ var Index = function () {
                 console.log(xhr);
                 console.log(status);
                 console.log(error);
+               var obj = JSON.parse(xhr.responseText);
                // window.location.href="http://localhost:18082/login";
-                toastr.error("请求获取其他服务登录人信息接口出错.");
+                toastr.error(obj.message);
             }
         });
     };

@@ -1,5 +1,6 @@
 package com.example.oauth.config;
 
+import com.example.oauth.config.handler.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -54,6 +56,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private AuthenticationManager authenticationManager;   //认证方式
     @Resource(name = "userService")
     private UserDetailsService userDetailsService;
+    @Autowired
+    private AuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
     public void configure(ClientDetailsServiceConfigurer configurer) throws Exception {
@@ -97,7 +101,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .realm(RESOURCE_ID)
                 .tokenKeyAccess("permitAll()")
                 .checkTokenAccess("isAuthenticated()") //isAuthenticated():排除anonymous   isFullyAuthenticated():排除anonymous以及remember-me
-                .allowFormAuthenticationForClients();  //允许表单认证  这段代码在授权码模式下会导致无法根据code　获取token　
+                .allowFormAuthenticationForClients(); //允许表单认证  这段代码在授权码模式下会导致无法根据code　获取token　
     }
 
 

@@ -12,7 +12,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
-
+@CrossOrigin
 @RestController
 public class UserController {
 

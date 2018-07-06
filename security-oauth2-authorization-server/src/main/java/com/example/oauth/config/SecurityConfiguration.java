@@ -1,13 +1,9 @@
 package com.example.oauth.config;
 
-
-import com.example.oauth.config.handler.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -17,15 +13,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
-
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /***
  * web 安全配置
+ *  ResourceServerConfiguration 和 SecurityConfiguration上配置的顺序,  SecurityConfiguration一定要在ResourceServerConfiguration 之前， 所以在SecurityConfiguration设置@Order(2), 在ResourceServerConfiguration上设置@Order(6)
  */
 @Configuration
 @EnableWebSecurity
@@ -64,19 +60,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .requestMatchers().antMatchers("/oauth/**","/login","/home")
+                .requestMatchers()   //　requestMatchers 配置　数组
+                .antMatchers("/oauth/**","/login","/home")
                 .and()
-                .authorizeRequests()
+                .authorizeRequests()         //authorizeRequests　配置权限　顺序为先配置需要放行的url 在配置需要权限的url，最后再配置.anyRequest().authenticated()
                 .antMatchers("/oauth/**").authenticated()
-                .and()
-                .exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler())
-                .authenticationEntryPoint(customAuthenticationEntryPoint())  //认证失败的业务处理
                 .and()
                 .formLogin()
                 .loginPage("/login")
                 .permitAll();
         http.addFilterBefore(simpleCORSFilter, SecurityContextPersistenceFilter.class);
-
     }
 
 
@@ -84,11 +77,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationEntryPoint customAuthenticationEntryPoint(){
-        return new CustomAuthenticationEntryPoint();
     }
 
 }
