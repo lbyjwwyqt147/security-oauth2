@@ -47,7 +47,9 @@ var Index = function () {
     var requestAdditionalResources = function () {
        // window.open(authorize_url);
         //window.open(authorize_url);
-        window.open("http://localhost:18082/home");
+       // window.open("http://localhost:18082/home");
+        window.open("http://localhost:18082/oauth/authorize?response_type=code&client_id=client_3&redirect_uri=http://localhost:18082/home");
+
       /*  layer.open({
             type: 2,
             title: false,
@@ -110,10 +112,68 @@ var Index = function () {
             }
         });
     };
-    var getToken = function(){
-        //密码 模式获取token
+    var getLocalUserInfo = function () {
+
         $.ajax({
-            url:"127.0.0.1:18081/oauth/token?username=qiaorulai&password=123456&grant_type=password&client_id=client_3&client_secret=secret",
+            url:"http://localhost:18083/api/user",
+            data:{
+                "access_token":access_token
+            },
+            type:'get',
+            dataType:'json',
+            withCredentials: true,
+            success:function(data,textStatus,XMLHttpRequest){
+                console.log(data);
+                App.alert({
+                    container: "#localhost_user_info",
+                    message:JSON.stringify(data),
+                    close: true,
+                    icon: 'fa fa-user',
+                    closeInSeconds: 1000
+                });
+            },
+            error:function(xhr,status,error){
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+                var obj = JSON.parse(xhr.responseText);
+                // window.location.href="http://localhost:18082/login";
+                toastr.error(obj.message);
+            }
+        });
+    };
+
+    var getLocalMsgInfo = function () {
+
+        $.ajax({
+            url:"http://localhost:18083/postMessages",
+            data:{
+                "access_token":access_token
+            },
+            type:'get',
+            dataType:'text',
+            withCredentials: true,
+            success:function(data,textStatus,XMLHttpRequest){
+                console.log(data);
+                toastr.success(data);
+            },
+            error:function(xhr,status,error){
+                console.log(xhr);
+                console.log(status);
+                console.log(error);
+                var obj = JSON.parse(xhr.responseText);
+                // window.location.href="http://localhost:18082/login";
+                toastr.error(obj.message);
+            }
+        });
+    };
+
+
+    var getToken = function(){
+        var code = getParam("code");
+        $.ajax({
+            //url:"127.0.0.1:18081/oauth/token?username=qiaorulai&password=123456&grant_type=password&client_id=client_3&client_secret=secret",
+            url:"http://localhost:18082/oauth/token?grant_type=authorization_code&client_id=client_3&client_secret=secret&redirect_uri=http://localhost:18083/index&code="+code,
             type:'get',
             dataType:'json',
             withCredentials: true,
@@ -125,20 +185,44 @@ var Index = function () {
                 toastr.error("请求获取token出现错误.");
             }
         });
+
+
+        /**
+         * 获取指定的URL参数值
+         * URL:http://www.quwan.com/index?name=tyler
+         * 参数：paramName URL参数
+         * 调用方法:getParam("name")
+         * 返回值:tyler
+         */
+        function getParam(paramName) {
+            var  paramValue = "", isFound = !1;
+            if (this.location.search.indexOf("?") == 0 && this.location.search.indexOf("=") > 1) {
+                arrSource = unescape(this.location.search).substring(1, this.location.search.length).split("&"), i = 0;
+                while (i < arrSource.length && !isFound) arrSource[i].indexOf("=") > 0 && arrSource[i].split("=")[0].toLowerCase() == paramName.toLowerCase() && (paramValue = arrSource[i].split("=")[1], isFound = !0), i++
+            }
+            return paramValue == "" && (paramValue = null), paramValue
+        };
     }
 
     return {
         //main function to initiate the module
         init: function () {
             handleIndex();
-            //getToken();
+            getToken();
         },
         authorization:function(){
             requestAdditionalResources();
         },
        userInfo:function(){
            getUserInfo();
+        },
+        localUserInfo:function(){
+            getLocalUserInfo();
+        },
+        localMsgInfo:function(){
+            getLocalMsgInfo();
         }
+
 
     };
 

@@ -95,11 +95,10 @@ demo 中使用了密码授权模式 和客户端授权模式
 ### 授权认证服务配置类
 
 
-
+````
 @Configuration
-<br>@EnableAuthorizationServer  //  注解开启验证服务器 提供/oauth/authorize,/oauth/token,/oauth/check_token,/oauth/confirm_access,/oauth/error
+@EnableAuthorizationServer  //  注解开启验证服务器 提供/oauth/authorize,/oauth/token,/oauth/check_token,/oauth/confirm_access,/oauth/error
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
-
     private static final String CLIEN_ID_ONE = "client_1";  //客户端1 用来标识客户的Id
     private static final String CLIEN_ID_TWO = "client_2";  //客户端2
     private static final String CLIEN_ID_THREE = "client_3";  //客户端3
@@ -197,11 +196,12 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         return defaultTokenServices;
     }
 }    
+````
 
 ### 资源服务认证配置
-
+````
 @Configuration
-<br>@EnableResourceServer  
+@EnableResourceServer  
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
     private static final String RESOURCE_ID = "*";
@@ -240,9 +240,9 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 
 }
 
-
+````
 ### Security 配置
-
+````
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -281,10 +281,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 }
-
+````
 ### security 登录认证
-
-@Service(value = "userService")<br>
+````
+@Service(value = "userService")
 public class UserServiceImpl implements UserDetailsService {
 
     @Autowired
@@ -303,8 +303,9 @@ public class UserServiceImpl implements UserDetailsService {
     }
 
 }
-
+````
 ### 请求方式说明
+````
 1. /oauth/authorize：授权端点。
 2. /oauth/token：获取token。
 3. /oauth/confirm_access：用户确认授权提交端点。
@@ -312,11 +313,11 @@ public class UserServiceImpl implements UserDetailsService {
 5. /oauth/check_token：用于资源服务访问的令牌解析端点。
 6. /oauth/token_key：提供公有密匙的端点，如果你使用JWT令牌的话。
 7. /oauth/logout: 退出
-
+````
 ### 授权码模式
 
 1. 浏览器直接访问地址：http://localhost:18082/oauth/authorize?response_type=code&client_id=client_3&redirect_uri=http://baidu.com
-
+````
       client_id：第三方应用在授权服务器注册的 Id
 
       response_type：固定值　code。
@@ -326,6 +327,7 @@ public class UserServiceImpl implements UserDetailsService {
       scope：权限
 
       state：随机字符串，可以省略
+`````
 2. 访问连接如果未登陆会跳转到登陆页面
 3. 输入数据库中账号和密码登陆后进行授权认可界面 点击“approve” 同意授权获取code返回：https://www.baidu.com/?code=lqByMd&state=123
     点击“deny” 拒绝授权 返回：https://www.baidu.com/?error=access_denied&error_description=User%20denied%20access&state=123
@@ -335,7 +337,7 @@ public class UserServiceImpl implements UserDetailsService {
     http://localhost:18082/oauth/token?grant_type=authorization_code&code=123456&client_id=client_3&client_secret=secret&redirect_uri=http://baidu.com
  如果出现登陆框这输入账号：client_3 密码 secret 登陆即可获取token信息
  注意：code　只能用一次，如果失败需要重新申请
- 
+ ````
  返回：
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiKiJdLCJ1c2VyX25hbWUiOiJxaWFvcnVsYWkiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTI5MjE4NjM2LCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl0sImp0aSI6ImQ2MjE5NDEyLTkxNDEtNDYyNi1iMjdiLWQ0M2ZhMGFkMTgzMSIsImNsaWVudF9pZCI6ImNsaWVudF8yIn0.2hsm_qXloexTLeEb1jtPOF6bIkiNYkBjg_Q2Azs9hxU",
@@ -345,14 +347,14 @@ public class UserServiceImpl implements UserDetailsService {
     "scope": "read write",
     "jti": "d6219412-9141-4626-b27b-d43fa0ad1831"
 }
-
+````
 ### 客户端模式获取token
 
 client模式，没有用户的概念，不需要传递username和password 参数，直接与认证服务器交互，用配置中的客户端信息去申请accessToken，客户端有自己的client_id,client_secret对应于用户的username,password，而客户端也拥有自己的authorities，当采取client模式认证时，对应的权限也就是客户端自己的authorities。
 client模式 貌似不支持刷新token请求
 
 请求方式：http://127.0.0.1:18081/oauth/token?grant_type=client_credentials&client_id=client_1&client_secret=secret
-
+````
 1. grant_type : client_credentials   client模式固定值
 2. client_id : client_1 对于我们注册客户端的 client_id  在AuthorizationServerConfiguration配置类中
 3. client_secret ： secret 对于我们注册客户端的 secret  在AuthorizationServerConfiguration配置类中
@@ -365,13 +367,13 @@ client模式 貌似不支持刷新token请求
     "scope": "read write",
     "jti": "847180ec-3349-441b-ae4a-510d17179d67"
 }
-
+````
 ### 密码模式获取token
 
 password模式，在认证时需要带上自己的用户名和密码，需要传递username和password 参数 ，以及客户端的client_id,client_secret。此时，accessToken所包含的权限是用户本身的权限，而不是客户端的权限。
 
 请求方式：127.0.0.1:18081/oauth/token?username=qiaorulai&password=123456&grant_type=password&client_id=client_2&client_secret=secret
-
+````
 1. username ： 系统的登录名
 2. password ： 系统的登录密码
 3. grant_type ： password  密码模式固定值
@@ -387,12 +389,12 @@ password模式，在认证时需要带上自己的用户名和密码，需要传
     "scope": "read write",
     "jti": "d6219412-9141-4626-b27b-d43fa0ad1831"
 }
-
+````
 ### 密码模式刷新token
 
 请求：http://localhost:18081/oauth/token?grant_type=refresh_token&refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiKiJdLCJ1c2VyX25hbWUiOiJxaWFvcnVsYWkiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiYXRpIjoiYTVkNGQyZTEtZTVhOS00MDA0LWFhNjctMjJlNzk4NGFjZTIzIiwiZXhwIjoxNTI5MjI4MDUxLCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl0sImp0aSI6IjVkNGVmMmNlLTc3MzEtNGVkYS1iZjFmLTkxZWVjYzk4YjQyOCIsImNsaWVudF9pZCI6ImNsaWVudF8yIn0.QH76vP6M3FtZt2ijNR3xWCfGGTG28adJdTrUJPztyk8&client_id=client_2&client_secret=secret
 
-
+````
 1. grant_type ： password  密码模式固定值
 2. client_id : client_2 对于我们注册客户端的 client_id  在AuthorizationServerConfiguration配置类中
 3. client_secret ： secret 对于我们注册客户端的 secret  在AuthorizationServerConfiguration配置类中
@@ -408,10 +410,11 @@ password模式，在认证时需要带上自己的用户名和密码，需要传
     "scope": "read write",
     "jti": "03279439-ccb6-4b73-b838-80509b5d5ac6"
 }
-
+````
 ### 不携带token访问接口
 请求：127.0.0.1:18081/users/list
-<br>返回：
+`````
+返回：
 {
     "timestamp": "2018-06-17T09:26:17.707+0000",
     "status": 401,
@@ -419,7 +422,7 @@ password模式，在认证时需要带上自己的用户名和密码，需要传
     "message": "Access Denied",
     "path": "/users/list"
 }
-
+`````
 ### 携带正确的token 访问接口
 请求：127.0.0.1:18081/users/list?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiKiJdLCJ1c2VyX25hbWUiOiJxaWFvcnVsYWkiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTI5MjMxMzE3LCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl0sImp0aSI6Ijc1Mzg3OWMyLTI4ZDktNDgxMy04YTAxLWZkNzQ4OGNlOWRkMCIsImNsaWVudF9pZCI6ImNsaWVudF8yIn0.V9I2lBYKk7sNsygj_bwrJZF06A8LhZx2x_MHmapppGE
 
@@ -428,11 +431,11 @@ password模式，在认证时需要带上自己的用户名和密码，需要传
 
 ### 携带不正确的token 访问接口
 请求：127.0.0.1:18081/users/list?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiKiJdLCJ1c2VyX25hbWUiOiJxaWFvcnVsYWkiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTI5MjMxMzE3LCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl0sImp0aSI6Ijc1Mzg3OWMyLTI4ZDktNDgxMy04YTAxLWZkNzQ4OGNlOWRkMCIsImNsaWVudF9pZCI6ImNsaWVudF8yIn0.V9I2lBYKk7sNsygj_bwrJZF06A8LhZx2x_MHmapppGE
-
+````
 返回：
 {
     "error": "invalid_token",
     "error_description": "Access token expired: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiKiJdLCJ1c2VyX25hbWUiOiJxaWFvcnVsYWkiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiXSwiZXhwIjoxNTI5MjE4NzM5LCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl0sImp0aSI6IjAzMjc5NDM5LWNjYjYtNGI3My1iODM4LTgwNTA5YjVkNWFjNiIsImNsaWVudF9pZCI6ImNsaWVudF8yIn0.vwXCxlLRKLbqnWm6HuqAVO0j2YzSn1oHQ-GX4LZkEx8"
 }
-
+````
 参考：http://websystique.com/spring-security/secure-spring-rest-api-using-oauth2/

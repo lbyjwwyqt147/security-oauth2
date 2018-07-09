@@ -33,13 +33,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
+                .requestMatchers()
+                .antMatchers("/oauth/**","/login","/index")
+                .and()
                 .authorizeRequests()
-                .antMatchers("/login", "/oauth/**","/home","/index").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/oauth/**").authenticated()
                 .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler())
                 .and()
                 .formLogin()
-                .permitAll();
+                .permitAll()
+                .loginProcessingUrl("/index");
         http.addFilterBefore(simpleCORSFilter,SecurityContextPersistenceFilter.class);
     }
 }

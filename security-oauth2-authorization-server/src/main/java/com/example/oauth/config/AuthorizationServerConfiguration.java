@@ -20,7 +20,6 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import org.springframework.security.web.AuthenticationEntryPoint;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -56,8 +55,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private AuthenticationManager authenticationManager;   //认证方式
     @Resource(name = "userService")
     private UserDetailsService userDetailsService;
-    @Autowired
-    private AuthenticationEntryPoint authenticationEntryPoint;
+
 
     @Override
     public void configure(ClientDetailsServiceConfigurer configurer) throws Exception {
@@ -71,7 +69,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .authorities("ROLE_CLIENT")  //客户端可以使用的权限
                 .secret(secret)  //secret客户端安全码
                 //.redirectUris(REDIRECT_URL)  //指定可以接受令牌和授权码的重定向URIs
-               // .autoApprove(true) // 为true 则不会被重定向到授权的页面，也不需要手动给请求授权,直接自动授权成功返回code
+                .autoApprove(true) // 为true 则不会被重定向到授权的页面，也不需要手动给请求授权,直接自动授权成功返回code
                 .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)   //token 时间秒
                 .refreshTokenValiditySeconds(FREFRESH_TOKEN_VALIDITY_SECONDS);//刷新token 时间 秒
 

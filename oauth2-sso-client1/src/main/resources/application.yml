@@ -1,6 +1,7 @@
 server:
   port: 18083
 
+
 spring:
   application:
     name: oauth2-sso-client1   # 应用名称
@@ -20,13 +21,13 @@ spring:
   # 数据源 配置
   datasource:
       platform: postgres
-      url: jdbc:postgresql://101.132.136.225:5432/cloud_oauth2?useUnicode=true&characterEncoding=utf-8
+      url: jdbc:postgresql://127.0.0.1:5432/cloud_oauth2?useUnicode=true&characterEncoding=utf-8
       username: postgres
       password: postgres123
       driver-class-name: org.postgresql.Driver
 
   redis:
-    host: 101.132.136.225
+    host: 127.0.0.1
     database: 0
 
   thymeleaf:
@@ -53,7 +54,7 @@ security:
       scope: read,write
     resource:
       token-info-uri: ${oauth2-server}/oauth/check_token  # 检查token
-      user-info-uri: ${oauth2-server}/api/user   # 用户信息
+      user-info-uri: ${oauth2-server}/oauth/me   # 用户信息
       jwt:
         key-uri: ${oauth2-server}/oauth/token_key
     sso:

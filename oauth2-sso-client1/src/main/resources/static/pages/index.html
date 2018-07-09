@@ -38,7 +38,7 @@
             <h1>获取其他服务登录人接口信息</h1>
             <button type="button"　id="user_btn" class="btn btn-primary mt-ladda-btn ladda-button btn-circle" data-style="expand-right" onclick="Index.userInfo()">
                 <span class="ladda-label">
-                    获取当前登录人信息　
+                    获取localhost:18082服务的当前登录人信息　
                     <i class="icon-arrow-right"></i>
                 </span>
                 <span class="ladda-spinner"></span>
@@ -48,8 +48,42 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <h1>登录人信息</h1>
+            <h1>localhost:18082服务的登录人信息</h1>
             <div id="user_info"></div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <h1>获取自身服务登录人接口信息</h1>
+            <button type="button"　id="localhost_user_btn" class="btn btn-primary mt-ladda-btn ladda-button btn-circle" data-style="expand-right" onclick="Index.localUserInfo()">
+                <span class="ladda-label">
+                    获取localhost:18083服务的当前登录人信息　
+                    <i class="icon-arrow-right"></i>
+                </span>
+                <span class="ladda-spinner"></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <h1>localhost:18083服务的登录人信息</h1>
+            <div id="localhost_user_info"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <h1>获取自身postMessages接口信息</h1>
+            <button type="button"　id="localhost_msg_user_btn" class="btn btn-primary mt-ladda-btn ladda-button btn-circle" data-style="expand-right" onclick="Index.localMsgInfo()">
+                <span class="ladda-label">
+                    获取localhost:18083服务的postMessages接口信息　
+                    <i class="icon-arrow-right"></i>
+                </span>
+                <span class="ladda-spinner"></span>
+            </button>
         </div>
     </div>
 
@@ -58,26 +92,6 @@
     </div>
 
 </div>
-<!--<div class="uk-grid">
-    <div class="uk-width-1-5"></div>
-    <div class="uk-width-3-5">
-        <h1>Demo</h1>
-        <p>Logged in as: <span th:text="${#httpServletRequest.remoteUser}">demo</span></p>
-        ${messages}
-
-        <form th:action="@{/postMessages}" class="uk-panel uk-panel-box uk-form" method="post">
-            <button class="uk-button uk-button-primary uk-button-large">Send</button>
-        </form>
-
-        <form th:action="@{/getMessages}" class="uk-panel uk-panel-box uk-form" method="get">
-            <button class="uk-button uk-button-primary uk-button-large">GET</button>
-        </form>
-
-        <span th:text="${#authentication.name}">Name</span>
-
-    </div>
-    <div class="uk-width-1-5"></div>
-</div>-->
 
 <script src="../assets/global/plugins/jquery.min.js" type="text/javascript"></script>
 <script src="../assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
